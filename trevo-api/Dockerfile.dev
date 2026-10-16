@@ -1,0 +1,15 @@
+FROM maven:3.9-eclipse-temurin-21
+
+WORKDIR /app
+
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw
+RUN ./mvnw -q dependency:go-offline
+
+COPY src src
+
+EXPOSE 8080
+
+# Use `sh` so local bind mounts do not depend on the host executable bit.
+CMD ["sh", "./mvnw", "spring-boot:run"]

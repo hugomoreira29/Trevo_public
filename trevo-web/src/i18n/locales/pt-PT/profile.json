@@ -1,0 +1,14 @@
+{
+  "profile": "Perfil",
+  "loadingProfile": "A carregar perfil...",
+  "loadProfileFailed": "Não foi possível carregar o perfil.",
+  "updateProfileFailed": "Não foi possível atualizar o perfil",
+  "fillNameEmail": "Preenche nome e email",
+  "fillPasswords": "Preenche a palavra-passe atual e a nova palavra-passe",
+  "newPasswordTooShort": "A nova palavra-passe deve ter pelo menos 8 caracteres",
+  "profileUpdated": "Perfil atualizado com sucesso",
+  "name": "Nome",
+  "phone": "Telefone",
+  "saveChanges": "Guardar alterações",
+  "saving": "A guardar..."
+}

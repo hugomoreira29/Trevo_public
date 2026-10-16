@@ -1,0 +1,24 @@
+# Stage 1: build the Spring Boot fat-jar
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+
+COPY .mvn .mvn
+COPY mvnw pom.xml ./
+RUN chmod +x mvnw
+# Download dependencies before copying source to maximise Docker cache re-use
+RUN ./mvnw -q dependency:go-offline
+
+COPY src src
+RUN ./mvnw -q package -DskipTests
+
+# Stage 2: minimal JRE runtime (no build tools, no source code)
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/trevo-api-*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

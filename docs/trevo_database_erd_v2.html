@@ -1,0 +1,238 @@
+
+<style>
+#erd svg.erDiagram .divider path { stroke-opacity: 0.5; }
+#erd svg.erDiagram .row-rect-odd path,
+#erd svg.erDiagram .row-rect-odd rect,
+#erd svg.erDiagram .row-rect-even path,
+#erd svg.erDiagram .row-rect-even rect { stroke: none !important; }
+#erd { overflow-x: auto; }
+</style>
+<div id="erd"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const { svg } = await mermaid.render('erd-svg', `erDiagram
+  USERS {
+    bigint id PK
+    varchar email UK
+    varchar password_hash
+    varchar full_name
+    varchar phone
+    enum role "BUYER | SHOP_OWNER"
+    enum status "ACTIVE | PENDING | SUSPENDED"
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  SHOPS {
+    bigint id PK
+    bigint owner_id FK "UK -> USERS"
+    varchar name
+    text description
+    varchar logo_url
+    varchar banner_url
+    varchar nif UK "9-digit PT tax number"
+    enum status "PENDING | ACTIVE | DEACTIVATED"
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  COLLECTIONS {
+    bigint id PK
+    bigint shop_id FK "-> SHOPS"
+    varchar name
+    int display_order
+    timestamp created_at
+  }
+
+  PRODUCTS {
+    bigint id PK
+    bigint shop_id FK "-> SHOPS"
+    varchar name
+    text description
+    decimal price "EUR"
+    varchar brand
+    varchar materials
+    enum status "ACTIVE | ARCHIVED"
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  PRODUCT_IMAGES {
+    bigint id PK
+    bigint product_id FK "-> PRODUCTS"
+    varchar image_url
+    int display_order
+  }
+
+  VARIANTS {
+    bigint id PK
+    bigint product_id FK "-> PRODUCTS"
+    varchar size
+    varchar color
+    int stock "CHECK >= 0"
+  }
+
+  PRODUCT_COLLECTIONS {
+    bigint product_id FK "-> PRODUCTS"
+    bigint collection_id FK "-> COLLECTIONS"
+  }
+
+  CARTS {
+    bigint id PK
+    bigint buyer_id FK "UK -> USERS"
+  }
+
+  CART_ITEMS {
+    bigint id PK
+    bigint cart_id FK "-> CARTS"
+    bigint variant_id FK "-> VARIANTS"
+    int quantity "CHECK > 0"
+  }
+
+  ORDERS {
+    bigint id PK
+    bigint buyer_id FK "-> USERS"
+    bigint shop_id FK "-> SHOPS"
+    enum status "PLACED | CONFIRMED | SHIPPED | DELIVERED | RETURNED | CANCELLED"
+    varchar tracking_number
+    decimal total_amount
+    decimal commission_amount
+    enum payment_method "STRIPE | PAYPAL | MBWAY"
+    varchar payment_reference
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  ORDER_ITEMS {
+    bigint id PK
+    bigint order_id FK "-> ORDERS"
+    bigint variant_id FK "-> VARIANTS"
+    int quantity
+    decimal unit_price
+  }
+
+  REVIEWS {
+    bigint id PK
+    bigint buyer_id FK "-> USERS"
+    bigint shop_id FK "-> SHOPS"
+    int rating "CHECK 1-5"
+    text comment
+    text response "Shop owner reply"
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  SUBSCRIPTIONS {
+    bigint id PK
+    bigint buyer_id FK "-> USERS"
+    enum status "ACTIVE | CANCELLED | EXPIRED"
+    varchar stripe_subscription_id UK
+    timestamp start_date
+    timestamp end_date
+    timestamp created_at
+  }
+
+  TRYON_USAGE {
+    bigint id PK
+    bigint buyer_id FK "-> USERS"
+    bigint product_id FK "-> PRODUCTS"
+    int generation_count "DEFAULT 0"
+  }
+
+  TRYON_IMAGES {
+    bigint id PK
+    bigint usage_id FK "-> TRYON_USAGE"
+    varchar image_url
+    timestamp generated_at
+  }
+
+  USER_PHOTOS {
+    bigint id PK
+    bigint buyer_id FK "-> USERS"
+    varchar photo_url
+    timestamp uploaded_at
+  }
+
+  REFRESH_TOKENS {
+    bigint id PK
+    bigint user_id FK "-> USERS"
+    varchar token UK
+    timestamp expires_at
+    boolean revoked "DEFAULT FALSE"
+    timestamp created_at
+  }
+
+  PASSWORD_RESET_TOKENS {
+    bigint id PK
+    bigint user_id FK "-> USERS"
+    varchar token UK
+    timestamp expires_at
+    boolean used "DEFAULT FALSE"
+    timestamp created_at
+  }
+
+  USERS ||--o| SHOPS : "owns (1:1)"
+  SHOPS ||--o{ COLLECTIONS : "has"
+  SHOPS ||--o{ PRODUCTS : "sells"
+  PRODUCTS ||--o{ PRODUCT_IMAGES : "has"
+  PRODUCTS ||--o{ VARIANTS : "has"
+  PRODUCTS }o--o{ COLLECTIONS : "belongs to"
+  PRODUCT_COLLECTIONS }o--|| PRODUCTS : "links"
+  PRODUCT_COLLECTIONS }o--|| COLLECTIONS : "links"
+  USERS ||--o| CARTS : "has (1:1)"
+  CARTS ||--o{ CART_ITEMS : "contains"
+  CART_ITEMS }o--|| VARIANTS : "references"
+  USERS ||--o{ ORDERS : "places"
+  SHOPS ||--o{ ORDERS : "receives"
+  ORDERS ||--o{ ORDER_ITEMS : "contains"
+  ORDER_ITEMS }o--|| VARIANTS : "references"
+  USERS ||--o{ REVIEWS : "writes"
+  SHOPS ||--o{ REVIEWS : "receives"
+  USERS ||--o| SUBSCRIPTIONS : "subscribes"
+  USERS ||--o{ TRYON_USAGE : "uses"
+  PRODUCTS ||--o{ TRYON_USAGE : "tried on"
+  TRYON_USAGE ||--o{ TRYON_IMAGES : "generates"
+  USERS ||--o{ USER_PHOTOS : "uploads"
+  USERS ||--o{ REFRESH_TOKENS : "has"
+  USERS ||--o{ PASSWORD_RESET_TOKENS : "has"
+`);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg.erDiagram .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd svg.erDiagram .row-rect-odd path, #erd svg.erDiagram .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>

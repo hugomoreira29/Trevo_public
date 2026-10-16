@@ -1,0 +1,4 @@
+ALTER TYPE user_role ADD VALUE IF NOT EXISTS 'ADMIN';
+
+DROP INDEX IF EXISTS idx_shops_is_active;
+ALTER TABLE shops DROP COLUMN IF EXISTS is_active;

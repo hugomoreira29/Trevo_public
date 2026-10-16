@@ -1,0 +1,46 @@
+services:
+  frontend:
+    environment:
+      VITE_API_BASE_URL: /api
+    ports: !reset []
+    networks:
+      - frontend-net
+
+  backend:
+    ports: !reset []
+    networks:
+      - frontend-net
+      - backend-net
+
+  db:
+    ports: !reset []
+    networks:
+      - backend-net
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN to the deployment hostname}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL for Let's Encrypt notices}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - frontend-net
+    depends_on:
+      - frontend
+      - backend
+
+networks:
+  frontend-net:
+  backend-net:
+    internal: true
+
+volumes:
+  caddy_data:
+  caddy_config:

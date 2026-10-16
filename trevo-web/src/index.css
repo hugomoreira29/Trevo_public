@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: theme("colors.ink.900");
+  }
+
+  body {
+    margin: 0;
+    background: #ffffff;
+  }
+
+  /* Tabular figures for prices, IDs */
+  .tabular {
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+}
+
+@layer components {
+  /* Reusable button bases — keep classes small, compose via @apply. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold text-sm
+           rounded px-4 py-2.5 leading-none border transition-colors
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-clover-500 text-white border-clover-500
+           hover:bg-clover-600 hover:border-clover-600
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-clover-400 focus-visible:ring-offset-2;
+  }
+  .btn-ink {
+    @apply btn bg-ink-900 text-white border-ink-900
+           hover:bg-ink-800 hover:border-ink-800
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-700 focus-visible:ring-offset-2;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink-900 border-ink-200
+           hover:bg-ink-50
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-300 focus-visible:ring-offset-2;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-medium text-sm
+           rounded px-3 py-2 leading-none text-ink-700 hover:text-ink-900 hover:bg-ink-50
+           disabled:opacity-40 disabled:cursor-not-allowed transition-colors;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700;
+  }
+
+  /* Form fields */
+  .field {
+    @apply flex flex-col gap-1.5;
+  }
+  .field-label {
+    @apply text-sm font-medium text-ink-800;
+  }
+  .field-help {
+    @apply text-xs text-ink-500;
+  }
+  .field-error {
+    @apply text-xs text-red-600;
+  }
+  .input,
+  .select,
+  .textarea {
+    @apply w-full font-sans text-sm px-3 py-2.5 rounded border border-ink-200 bg-white text-ink-900
+           placeholder:text-ink-400
+           focus:outline-none focus:border-clover-500 focus:ring-[3px] focus:ring-clover-500/15;
+  }
+  .input-error {
+    @apply border-red-500 focus:border-red-600 focus:ring-red-500/15;
+  }
+
+  /* Pills for size / color / option selection */
+  .opt-pill {
+    @apply text-sm px-3.5 py-2 rounded border border-ink-200 bg-white text-ink-900 cursor-pointer
+           transition-colors hover:bg-ink-50
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white;
+  }
+  .opt-pill-selected {
+    @apply bg-ink-900 text-white border-ink-900 hover:bg-ink-800;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white border border-ink-200 rounded;
+  }
+  .card-pad {
+    @apply p-4;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider
+           px-2 py-0.5 rounded;
+  }
+  .badge-success { @apply bg-green-50 text-green-700; }
+  .badge-warning { @apply bg-amber-50 text-amber-700; }
+  .badge-danger  { @apply bg-red-50 text-red-700; }
+  .badge-info    { @apply bg-blue-50 text-blue-700; }
+  .badge-brand   { @apply bg-clover-100 text-clover-700; }
+  .badge-pro     { @apply bg-amber-400 text-amber-900; }
+  .badge-neutral { @apply bg-ink-100 text-ink-700 normal-case tracking-normal; }
+
+  /* Type helpers */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-ink-500;
+  }
+  .h-display { @apply text-5xl md:text-6xl font-bold tracking-tighter leading-[1.1]; }
+  .h-page    { @apply text-3xl md:text-4xl font-bold tracking-tighter leading-tight; }
+  .h-section { @apply text-2xl font-semibold tracking-tight; }
+  .muted     { @apply text-ink-500; }
+
+  /* Container */
+  .page-shell { @apply max-w-6xl mx-auto px-6 py-10 md:py-14; }
+  .page-shell-narrow { @apply max-w-3xl mx-auto px-6 py-10 md:py-14; }
+}
