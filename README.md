@@ -161,6 +161,17 @@ Trevo/
 | Hugo | Backend Developer |
 | Martim | Database Engineer |
 
+## Team & Contributions
+
+Trevo was developed as a collaborative team project. My primary role was **Backend Developer**, contributing to the server-side implementation using Spring Boot and Java.
+
+### My Role
+- **Backend Developer** — Contributed to backend development using Java 21 and Spring Boot, working on API functionality and server-side application logic.
+
+Thanks to the entire team for their collaboration and contributions to Trevo.
+
+
+
 ## Branch Strategy
 
 - `main` — stable, protected
